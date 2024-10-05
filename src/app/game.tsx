@@ -40,7 +40,7 @@ const Game = () => {
                 </View>
 
                 <View className="flex-wrap flex-row justify-between">
-                    {Array.from({length: Math.min(Number(m),Number(n))}, (_, i) => (
+                    {Array.from({length: Math.min(Number(m), 2 * Number(n) + 1)}, (_, i) => (
                         <MatchesButton key={i} numberOfMatches={i + 1} onPress={() => handlePress(i + 1)}
                                        disabled={!isPlayerMove || i >= matches}/>
                     ))}
