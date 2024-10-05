@@ -28,26 +28,17 @@ const useGame = (n: number, m: number, firstMove: boolean) => {
         Alert.alert("Game over", `You ${isPlayerWinner ? "won!🥳🥳🥳" : "lost😢😢😢. "}`, [
             {
                 text: 'Restart',
-                onPress: () => {
-                    console.log('Restart pressed');
-                    handleGameRestart();
-                },
+                onPress: handleGameRestart
             },
             {
                 text: 'Exit',
-                onPress: () => {
-                    console.log('Exit Pressed');
-                    router.back();
-                },
+                onPress: () => router.back(),
                 style: 'cancel',
             }
         ]);
     };
 
     useEffect(() => {
-        console.log("Start");
-        console.log(matches);
-        console.log(isPlayerMove);
         if (matches <= 0)
             return handleGameOver();
         if (isPlayerMove) return;
