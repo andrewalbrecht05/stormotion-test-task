@@ -39,7 +39,7 @@ const Game = () => {
                     <EntityPile entityName="enemy" score={computerScore}/>
                 </View>
 
-                <View className="flex-wrap flex-row justify-between">
+                <View className="flex-wrap flex-row justify-start">
                     {Array.from({length: Math.min(Number(m), 2 * Number(n) + 1)}, (_, i) => (
                         <MatchesButton key={i} numberOfMatches={i + 1} onPress={() => handlePress(i + 1)}
                                        disabled={!isPlayerMove || i >= matches}/>
