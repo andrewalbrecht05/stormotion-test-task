@@ -1,30 +1,33 @@
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {Alert} from "react-native";
 import {router} from "expo-router";
-import {computerMove} from "@utils/logic";
+import Computer from "@utils/logic";
 
 const useGame = (n: number, m: number, firstMove: boolean) => {
     const [matches, setMatches] = useState(2 * Number(n) + 1);
     const [playerScore, setPlayerScore] = useState(0);
     const [computerScore, setComputerScore] = useState(0);
     const [isPlayerMove, setIsPlayerMove] = useState(firstMove);
+    const [isGameOver, setIsGameOver] = useState(false);
+
+    const computer = useMemo(() => new Computer(2 * n + 1, m), [n, m]);
 
     const handlePress = (num: number) => {
-        setMatches(matches - num);
-        setPlayerScore(playerScore + num);
-        setIsPlayerMove(!isPlayerMove);
+        setMatches(prevMatches => prevMatches - num);
+        setPlayerScore(prevScore => prevScore + num);
+        setIsPlayerMove(prevMove => !prevMove);
     }
 
     const handleGameRestart = () => {
-        setMatches(2 * Number(n) + 1);
+        setMatches(2 * n + 1);
         setPlayerScore(0);
         setComputerScore(0);
         setIsPlayerMove(firstMove);
+        setIsGameOver(false);
     }
 
     const handleGameOver = () => {
-        const isPlayerWinner = playerScore % 2 === 0 && computerScore % 2 !== 0;
-
+        const isPlayerWinner = playerScore % 2 == 0;
         Alert.alert("Game over", `You ${isPlayerWinner ? "won!🥳🥳🥳" : "lost😢😢😢. "}`, [
             {
                 text: 'Restart',
@@ -39,19 +42,27 @@ const useGame = (n: number, m: number, firstMove: boolean) => {
     };
 
     useEffect(() => {
-        if (matches <= 0)
-            return handleGameOver();
-        if (isPlayerMove) return;
+        if (isGameOver) return;
 
-        const move = computerMove(matches, m, computerScore);
+        if (matches <= 0) {
+            setIsGameOver(true);
+            handleGameOver();
+            return;
+        }
 
+        if (!isPlayerMove ) {
+            const move = computer.makeMove(matches, playerScore);
 
-        setTimeout(() => {
-            setMatches(matches - move);
-            setComputerScore(computerScore + move);
-            setIsPlayerMove(!isPlayerMove);
-        }, 1000)
-    }, [isPlayerMove]);
+            const timeout = setTimeout(() => {
+                setMatches(prevMatches => prevMatches - move);
+                setComputerScore(prevComputerScore => prevComputerScore + move);
+                setIsPlayerMove(true);
+            }, 1000);
+
+            if( timeout )
+                return () => clearTimeout(timeout);
+        }
+    }, [matches, isPlayerMove, isGameOver, playerScore]);
 
     return {
         matches,
